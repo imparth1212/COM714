@@ -1,0 +1,610 @@
+
+import tkinter as tk
+import matplotli.pyplot as plt
+
+class Journey:
+    def __init__(self, name, start_date, duration, contact_info):
+        self.name = name
+        self.start_date = start_date
+        self.duration = duration
+        self.contact_info = contact_info
+        # Add more attributes as needed
+
+    def updateJourney(self, **kwargs):
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+            else:
+                raise AttributeError(f"'{type(self).__name__}' object has no attribute '{key}'")
+
+    def deleteJourney(self):
+        print(f"Journey '{self.name}' has been deleted.")
+
+class Traveller:
+    def __init__(self, name, address, date_of_birth, emergency_contact):
+        self.name = name
+        self.address = address
+        self.date_of_birth = date_of_birth
+        self.emergency_contact = emergency_contact
+        # Add more attributes as needed
+
+    def updateTraveller(self, **kwargs):
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+            else:
+                raise AttributeError(f"'{type(self).__name__}' object has no attribute '{key}'")
+
+    def deleteTraveller(self):
+        print(f"Traveller '{self.name}' has been deleted.")
+
+class JourneyLeg:
+    def __init__(self, start_location, destination, transport_provider, mode_of_transport, cost):
+        self.start_location = start_location
+        self.destination = destination
+        self.transport_provider = transport_provider
+        self.mode_of_transport = mode_of_transport
+        self.cost = cost
+        # Add more attributes as needed
+
+    def updateJourneyLeg(self, **kwargs):
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+            else:
+                raise AttributeError(f"'{type(self).__name__}' object has no attribute '{key}'")
+
+    def deleteJourneyLeg(self):
+        print(f"Journey leg from {self.start_location} to {self.destination} has been deleted.")
+
+class JourneyCoordinator:
+    def __init__(self, name, contact_info):
+        self.name = name
+        self.contact_info = contact_info
+        # Add more attributes as needed
+
+    def updateJourneyCoordinator(self, **kwargs):
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+            else:
+                raise AttributeError(f"'{type(self).__name__}' object has no attribute '{key}'")
+
+    def deleteJourneyCoordinator(self):
+        print(f"Journey Coordinator '{self.name}' has been deleted.")
+    
+
+class JourneyManager:
+    def __init__(self):
+        self.Journeys = []  # Initialize list to store Journeys
+
+    def generateJourneyDurationReport(self):
+        Journey_names = []
+        Journey_durations = []
+
+        for Journey in self.Journeys:
+            Journey_names.append(Journey.name)
+            Journey_durations.append(int(Journey.duration))  # Assuming duration is in integer format
+
+        plt.figure(figsize=(10, 6))
+        plt.bar(Journey_names, Journey_durations, color='skyblue')
+        plt.xlabel('Journey Name')
+        plt.ylabel('Duration (days)')
+        plt.title('Journey Duration Report')
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+        plt.savefig('Journey_duration_report.png')  # Save the report as an image
+        plt.close()  # Close the plot to release memory
+
+
+class JourneyManagementApp(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Travel Management System")
+        self.geometry("800x600")
+        self.Journeys = []  # List to store created Journeys
+        self.travellers = []  # List to store created travellers
+        self.Journey_legs = []  # List to store created Journey legs
+        self.Journey_coordinators = []  # List to store created Journey coordinators
+        self.Journey_manager = JourneyManager()  # Initialize JourneyManager
+        self.selected_Journey_id = None
+
+        # Configure background color
+        self.configure(bg="#f0f0f0")
+
+        # Initialize GUI components
+        self.createWidgets()
+
+    def createWidgets(self):
+        # Create Buttons for Journey, Traveller, Journey Leg, Journey Coordinator, and Journey Manager Functions
+        self.btn_Journey = tk.Button(self, text="Journey", command=self.showJourneyForm, bg="#4CAF50", fg="white", font=('Helvetica', 14, 'bold'), width=20, height=2)
+        self.btn_traveller = tk.Button(self, text="Traveller", command=self.showTravellerForm, bg="#FF9800", fg="white", font=('Helvetica', 14, 'bold'), width=20, height=2)
+        self.btn_Journey_leg = tk.Button(self, text="Journey Leg", command=self.showJourneyLegForm, bg="#2196F3", fg="white", font=('Helvetica', 14, 'bold'), width=20, height=2)
+        self.btn_Journey_coordinator = tk.Button(self, text="Journey Coordinator", command=self.showJourneyCoordinatorForm, bg="#9C27B0", fg="white", font=('Helvetica', 14, 'bold'), width=20, height=2)
+        self.btn_generate_report = tk.Button(self, text="Generate Journey Duration Report", command=self.generateJourneyDurationReport, bg="#607D8B", fg="white", font=('Helvetica', 14, 'bold'), width=50, height=2)
+
+        # Layout Buttons using grid manager
+        self.btn_Journey.grid(row=0, column=0, padx=10, pady=10)
+        self.btn_traveller.grid(row=0, column=1, padx=10, pady=10)
+        self.btn_Journey_leg.grid(row=0, column=2, padx=10, pady=10)
+        self.btn_Journey_coordinator.grid(row=0, column=3, padx=10, pady=10)
+        self.btn_generate_report.grid(row=1, column=0, columnspan=4, padx=10, pady=10)
+
+    def generateJourneyDurationReport(self):
+        # Call JourneyManager's method to generate Journey duration report
+        self.Journey_manager.generateJourneyDurationReport()
+        print("Journey duration report generated successfully.")
+
+    def generateInvoice(self):
+        # Call JourneyManager's generateInvoice method with selected Journey ID
+        if self.selected_Journey_id:
+            self.Journey_manager.generateInvoice(self.selected_Journey_id, self)
+
+    def displayInvoice(self, invoice_text):
+        # Create Text widget to display invoice
+        self.invoice_text = tk.Text(self, height=10, width=50)
+        self.invoice_text.grid(row=2, column=0, columnspan=4, padx=10, pady=10)
+        # Display invoice text in the Text widget
+        self.invoice_text.delete(1.0, tk.END)  # Clear previous content
+        self.invoice_text.insert(tk.END, invoice_text)
+
+        
+    def clearWidgets(self):
+        # Destroy all widgets
+        for widget in self.winfo_children():
+            widget.destroy()
+
+    def showJourneyForm(self):
+        # Destroy existing widgets and show Journey form
+        self.clearWidgets()
+        self.createJourneyForm()
+
+    def showTravellerForm(self):
+        # Destroy existing widgets and show traveller form
+        self.clearWidgets()
+        self.createTravellerForm()
+
+
+    def showJourneyLegForm(self):
+        # Destroy existing widgets and show Journey leg form
+        self.clearWidgets()
+        self.createJourneyLegForm()
+
+    def showJourneyCoordinatorForm(self):
+        # Destroy existing widgets and show Journey coordinator form
+        self.clearWidgets()
+        self.createJourneyCoordinatorForm()
+
+    def clearWidgets(self):
+        # Destroy all widgets
+        for widget in self.winfo_children():
+            widget.destroy()
+
+    def createJourneyForm(self):
+        # Create Labels
+        self.lbl_name = tk.Label(self, text="Journey Name:")
+        self.lbl_start_date = tk.Label(self, text="Start Date:")
+        self.lbl_duration = tk.Label(self, text="Duration:")
+        self.lbl_contact_info = tk.Label(self, text="Contact Information:")
+
+        # Create Entry fields
+        self.entry_name = tk.Entry(self)
+        self.entry_start_date = tk.Entry(self)
+        self.entry_duration = tk.Entry(self)
+        self.entry_contact_info = tk.Entry(self)
+
+        # Create Buttons
+        self.btn_createJourney = tk.Button(self, text="Create Journey", command=self.createJourney, width=15)
+        self.btn_updateJourney = tk.Button(self, text="Update Journey", command=self.updateJourney, width=15)
+        self.btn_deleteJourney = tk.Button(self, text="Delete Journey", command=self.deleteJourney, width=15)
+
+        # Create Journey Listbox
+        self.Journey_listbox = tk.Listbox(self)
+        self.Journey_listbox.bind("<<ListboxSelect>>", self.onJourneySelect)
+
+        # Layout GUI components using grid manager
+        self.lbl_name.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        self.entry_name.grid(row=1, column=1, padx=10, pady=5)
+        self.lbl_start_date.grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        self.entry_start_date.grid(row=2, column=1, padx=10, pady=5)
+        self.lbl_duration.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+        self.entry_duration.grid(row=3, column=1, padx=10, pady=5)
+        self.lbl_contact_info.grid(row=4, column=0, padx=10, pady=5, sticky="w")
+        self.entry_contact_info.grid(row=4, column=1, padx=10, pady=5)
+        self.btn_createJourney.grid(row=5, column=0, padx=10, pady=10, columnspan=3)
+        self.btn_updateJourney.grid(row=6, column=0, padx=10, pady=10, columnspan=3)
+        self.btn_deleteJourney.grid(row=7, column=0, padx=10, pady=10, columnspan=3)
+        self.Journey_listbox.grid(row=8, column=0, columnspan=3, padx=10, pady=10)
+
+    def createTravellerForm(self):
+        # Create Labels
+        self.lbl_name = tk.Label(self, text="Name:")
+        self.lbl_address = tk.Label(self, text="Address:")
+        self.lbl_date_of_birth = tk.Label(self, text="Date of Birth:")
+        self.lbl_emergency_contact = tk.Label(self, text="Emergency Contact:")
+
+        # Create Entry fields
+        self.entry_name = tk.Entry(self)
+        self.entry_address = tk.Entry(self)
+        self.entry_date_of_birth = tk.Entry(self)
+        self.entry_emergency_contact = tk.Entry(self)
+
+        # Create Buttons
+        self.btn_createTraveller = tk.Button(self, text="Create Traveller", command=self.createTraveller, width=15)
+        self.btn_updateTraveller = tk.Button(self, text="Update Traveller", command=self.updateTraveller, width=15)
+        self.btn_deleteTraveller = tk.Button(self, text="Delete Traveller", command=self.deleteTraveller, width=15)
+
+        # Create Traveller Listbox
+        self.traveller_listbox = tk.Listbox(self)
+        self.traveller_listbox.bind("<<ListboxSelect>>", self.onTravellerSelect)
+
+        # Layout GUI components using grid manager
+        self.lbl_name.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        self.entry_name.grid(row=1, column=1, padx=10, pady=5)
+        self.lbl_address.grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        self.entry_address.grid(row=2, column=1, padx=10, pady=5)
+        self.lbl_date_of_birth.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+        self.entry_date_of_birth.grid(row=3, column=1, padx=10, pady=5)
+        self.lbl_emergency_contact.grid(row=4, column=0, padx=10, pady=5, sticky="w")
+        self.entry_emergency_contact.grid(row=4, column=1, padx=10, pady=5)
+        self.btn_createTraveller.grid(row=5, column=0, padx=10, pady=10, columnspan=3)
+        self.btn_updateTraveller.grid(row=6, column=0, padx=10, pady=10, columnspan=3)
+        self.btn_deleteTraveller.grid(row=7, column=0, padx=10, pady=10, columnspan=3)
+        self.traveller_listbox.grid(row=8, column=0, columnspan=3, padx=10, pady=10)
+
+    def createJourneyLegForm(self):
+        # Create Labels
+        self.lbl_start_location = tk.Label(self, text="Start Location:")
+        self.lbl_destination = tk.Label(self, text="Destination:")
+        self.lbl_transport_provider = tk.Label(self, text="Transport Provider:")
+        self.lbl_mode_of_transport = tk.Label(self, text="Mode of Transport:")
+        self.lbl_cost = tk.Label(self, text="Cost:")
+
+        # Create Entry fields
+        self.entry_start_location = tk.Entry(self)
+        self.entry_destination = tk.Entry(self)
+        self.entry_transport_provider = tk.Entry(self)
+        self.entry_mode_of_transport = tk.Entry(self)
+        self.entry_cost = tk.Entry(self)
+
+        # Create Buttons
+        self.btn_createJourneyLeg = tk.Button(self, text="Create Journey Leg", command=self.createJourneyLeg, width=15)
+        self.btn_updateJourneyLeg = tk.Button(self, text="Update Journey Leg", command=self.updateJourneyLeg, width=15)
+        self.btn_deleteJourneyLeg = tk.Button(self, text="Delete Journey Leg", command=self.deleteJourneyLeg, width=15)
+
+        # Create Journey Leg Listbox
+        self.Journey_leg_listbox = tk.Listbox(self)
+        self.Journey_leg_listbox.bind("<<ListboxSelect>>", self.onJourneyLegSelect)
+
+        # Layout GUI components using grid manager
+        self.lbl_start_location.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        self.entry_start_location.grid(row=1, column=1, padx=10, pady=5)
+        self.lbl_destination.grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        self.entry_destination.grid(row=2, column=1, padx=10, pady=5)
+        self.lbl_transport_provider.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+        self.entry_transport_provider.grid(row=3, column=1, padx=10, pady=5)
+        self.lbl_mode_of_transport.grid(row=4, column=0, padx=10, pady=5, sticky="w")
+        self.entry_mode_of_transport.grid(row=4, column=1, padx=10, pady=5)
+        self.lbl_cost.grid(row=5, column=0, padx=10, pady=5, sticky="w")
+        self.entry_cost.grid(row=5, column=1, padx=10, pady=5)
+        self.btn_createJourneyLeg.grid(row=6, column=0, padx=10, pady=10, columnspan=3)
+        self.btn_updateJourneyLeg.grid(row=7, column=0, padx=10, pady=10, columnspan=3)
+        self.btn_deleteJourneyLeg.grid(row=8, column=0, padx=10, pady=10, columnspan=3)
+        self.Journey_leg_listbox.grid(row=9, columnspan=3, padx=10, pady=10)
+
+
+    def createJourney(self):
+        # Get values from entry fields
+        Journey_name = self.entry_name.get()
+        start_date = self.entry_start_date.get()
+        duration = self.entry_duration.get()
+        contact_info = self.entry_contact_info.get()
+
+        # Create new Journey
+        new_Journey = Journey(Journey_name, start_date, duration, contact_info)
+        self.Journeys.append(new_Journey)
+
+        # Update Journey listbox
+        self.updateJourneyListbox()
+
+    def updateJourney(self):
+        # Get selected Journey index
+        selected_index = self.Journey_listbox.curselection()
+        if selected_index:
+            Journey_index = selected_index[0]
+            Journey = self.Journeys[Journey_index]
+
+            # Get values from entry fields
+            Journey_name = self.entry_name.get()
+            start_date = self.entry_start_date.get()
+            duration = self.entry_duration.get()
+            contact_info = self.entry_contact_info.get()
+
+            # Update Journey attributes
+            Journey.updateJourney(name=Journey_name, start_date=start_date, duration=duration, contact_info=contact_info)
+
+            # Update Journey listbox
+            self.updateJourneyListbox()
+
+    def deleteJourney(self):
+        # Get selected Journey index
+        selected_index = self.Journey_listbox.curselection()
+        if selected_index:
+            Journey_index = selected_index[0]
+            deleted_Journey = self.Journeys.pop(Journey_index)
+            deleted_Journey.deleteJourney()
+
+            # Update Journey listbox
+            self.updateJourneyListbox()
+
+    def onJourneySelect(self, event):
+        # Get selected Journey index
+        selected_index = self.Journey_listbox.curselection()
+        if selected_index:
+            Journey_index = selected_index[0]
+            Journey = self.Journeys[Journey_index]
+
+            # Update entry fields with selected Journey details
+            self.entry_name.delete(0, tk.END)
+            self.entry_name.insert(tk.END, Journey.name)
+            self.entry_start_date.delete(0, tk.END)
+            self.entry_start_date.insert(tk.END, Journey.start_date)
+            self.entry_duration.delete(0, tk.END)
+            self.entry_duration.insert(tk.END, Journey.duration)
+            self.entry_contact_info.delete(0, tk.END)
+            self.entry_contact_info.insert(tk.END, Journey.contact_info)
+        else:
+            # Clear entry fields if no journey is selected
+            self.entry_name.delete(0, tk.END)
+            self.entry_start_date.delete(0, tk.END)
+            self.entry_duration.delete(0, tk.END)
+            self.entry_contact_info.delete(0, tk.END)
+
+    def updateJourneyListbox(self):
+        # Clear existing listbox items
+        self.Journey_listbox.delete(0, tk.END)
+
+        # Add Journey names to listbox
+        for Journey in self.Journeys:
+            self.Journey_listbox.insert(tk.END, Journey.name)
+
+    def createTraveller(self):
+        # Get values from entry fields
+        name = self.entry_name.get()
+        address = self.entry_address.get()
+        date_of_birth = self.entry_date_of_birth.get()
+        emergency_contact = self.entry_emergency_contact.get()
+
+        # Create new traveller
+        new_traveller = Traveller(name, address, date_of_birth, emergency_contact)
+        self.travellers.append(new_traveller)
+
+        # Update traveller listbox
+        self.updateTravellerListbox()
+
+    def updateTraveller(self):
+        # Get selected traveller index
+        selected_index = self.traveller_listbox.curselection()
+        if selected_index:
+            traveller_index = selected_index[0]
+            traveller = self.travellers[traveller_index]
+
+            # Get values from entry fields
+            name = self.entry_name.get()
+            address = self.entry_address.get()
+            date_of_birth = self.entry_date_of_birth.get()
+            emergency_contact = self.entry_emergency_contact.get()
+
+            # Update traveller attributes
+            traveller.updateTraveller(name=name, address=address, date_of_birth=date_of_birth, emergency_contact=emergency_contact)
+
+            # Update traveller listbox
+            self.updateTravellerListbox()
+
+    def deleteTraveller(self):
+        # Get selected traveller index
+        selected_index = self.traveller_listbox.curselection()
+        if selected_index:
+            traveller_index = selected_index[0]
+            deleted_traveller = self.travellers.pop(traveller_index)
+            deleted_traveller.deleteTraveller()
+
+            # Update traveller listbox
+            self.updateTravellerListbox()
+
+    def onTravellerSelect(self, event):
+        # Get selected traveller index
+        selected_index = self.traveller_listbox.curselection()
+        if selected_index:
+            traveller_index = selected_index[0]
+            traveller = self.travellers[traveller_index]
+
+            # Update entry fields with selected traveller details
+            self.entry_name.delete(0, tk.END)
+            self.entry_name.insert(tk.END, traveller.name)
+            self.entry_address.delete(0, tk.END)
+            self.entry_address.insert(tk.END, traveller.address)
+            self.entry_date_of_birth.delete(0, tk.END)
+            self.entry_date_of_birth.insert(tk.END, traveller.date_of_birth)
+            self.entry_emergency_contact.delete(0, tk.END)
+            self.entry_emergency_contact.insert(tk.END, traveller.emergency_contact)
+
+    def updateTravellerListbox(self):
+        # Clear existing listbox items
+        self.traveller_listbox.delete(0, tk.END)
+
+        # Add traveller names to listbox
+        for traveller in self.travellers:
+            self.traveller_listbox.insert(tk.END, traveller.name)
+
+    def createJourneyLeg(self):
+        # Get values from entry fields
+        start_location = self.entry_start_location.get()
+        destination = self.entry_destination.get()
+        transport_provider = self.entry_transport_provider.get()
+        mode_of_transport = self.entry_mode_of_transport.get()
+        cost = self.entry_cost.get()
+
+        # Create new Journey leg
+        new_Journey_leg = JourneyLeg(start_location, destination, transport_provider, mode_of_transport, cost)
+        self.Journey_legs.append(new_Journey_leg)
+
+        # Update Journey leg listbox
+        self.updateJourneyLegListbox()
+
+    def updateJourneyLeg(self):
+        # Get selected Journey leg index
+        selected_index = self.Journey_leg_listbox.curselection()
+        if selected_index:
+            Journey_leg_index = selected_index[0]
+            Journey_leg = self.Journey_legs[Journey_leg_index]
+
+            # Get values from entry fields
+            start_location = self.entry_start_location.get()
+            destination = self.entry_destination.get()
+            transport_provider = self.entry_transport_provider.get()
+            mode_of_transport = self.entry_mode_of_transport.get()
+            cost = self.entry_cost.get()
+
+            # Update Journey leg attributes
+            Journey_leg.start_location = start_location
+            Journey_leg.destination = destination
+            Journey_leg.transport_provider = transport_provider
+            Journey_leg.mode_of_transport = mode_of_transport
+            Journey_leg.cost = cost
+
+            # Update Journey leg listbox
+            self.updateJourneyLegListbox()
+
+    def deleteJourneyLeg(self):
+        # Get selected Journey leg index
+        selected_index = self.Journey_leg_listbox.curselection()
+        if selected_index:
+            Journey_leg_index = selected_index[0]
+            deleted_Journey_leg = self.Journey_legs.pop(Journey_leg_index)
+
+            # Update Journey leg listbox
+            self.updateJourneyLegListbox()
+
+    def onJourneyLegSelect(self, event):
+        # Get selected Journey leg index
+        selected_index = self.Journey_leg_listbox.curselection()
+        if selected_index:
+            Journey_leg_index = selected_index[0]
+            Journey_leg = self.Journey_legs[Journey_leg_index]
+
+            # Update entry fields with selected Journey leg details
+            self.entry_start_location.delete(0, tk.END)
+            self.entry_start_location.insert(tk.END, Journey_leg.start_location)
+            self.entry_destination.delete(0, tk.END)
+            self.entry_destination.insert(tk.END, Journey_leg.destination)
+            self.entry_transport_provider.delete(0, tk.END)
+            self.entry_transport_provider.insert(tk.END, Journey_leg.transport_provider)
+            self.entry_mode_of_transport.delete(0, tk.END)
+            self.entry_mode_of_transport.insert(tk.END, Journey_leg.mode_of_transport)
+            self.entry_cost.delete(0, tk.END)
+            self.entry_cost.insert(tk.END, Journey_leg.cost)
+
+    def updateJourneyLegListbox(self):
+        # Clear existing listbox items
+        self.Journey_leg_listbox.delete(0, tk.END)
+
+        # Add Journey leg details to listbox
+        for Journey_leg in self.Journey_legs:
+            self.Journey_leg_listbox.insert(tk.END, f"From: {Journey_leg.start_location} - To: {Journey_leg.destination}")
+
+
+
+    def createJourneyCoordinatorForm(self):
+        # Create Labels
+        self.lbl_name = tk.Label(self, text="Name:")
+        self.lbl_contact_info = tk.Label(self, text="Contact Information:")
+
+        # Create Entry fields
+        self.entry_name = tk.Entry(self)
+        self.entry_contact_info = tk.Entry(self)
+
+        # Create Buttons
+        self.btn_createJourneyCoordinator = tk.Button(self, text="Create Journey Coordinator", command=self.createJourneyCoordinator)
+        self.btn_updateJourneyCoordinator = tk.Button(self, text="Update Journey Coordinator", command=self.updateJourneyCoordinator)
+        self.btn_deleteJourneyCoordinator = tk.Button(self, text="Delete Journey Coordinator", command=self.deleteJourneyCoordinator)
+
+        # Create Journey Coordinator Listbox
+        self.Journey_coordinator_listbox = tk.Listbox(self)
+        self.Journey_coordinator_listbox.bind("<<ListboxSelect>>", self.onJourneyCoordinatorSelect)
+
+        # Layout GUI components using grid manager
+        self.lbl_name.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+        self.entry_name.grid(row=0, column=1, padx=10, pady=5)
+        self.lbl_contact_info.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+        self.entry_contact_info.grid(row=1, column=1, padx=10, pady=5)
+        self.btn_createJourneyCoordinator.grid(row=2, column=0, padx=10, pady=10)
+        self.btn_updateJourneyCoordinator.grid(row=2, column=1, padx=10, pady=10)
+        self.btn_deleteJourneyCoordinator.grid(row=2, column=2, padx=10, pady=10)
+        self.Journey_coordinator_listbox.grid(row=3, column=0, columnspan=3, padx=10, pady=10)
+
+    def createJourneyCoordinator(self):
+        # Get values from entry fields
+        name = self.entry_name.get()
+        contact_info = self.entry_contact_info.get()
+
+        # Create new Journey coordinator
+        new_Journey_coordinator = JourneyCoordinator(name, contact_info)
+        self.Journey_coordinators.append(new_Journey_coordinator)
+
+        # Update Journey coordinator listbox
+        self.updateJourneyCoordinatorListbox()
+
+    def updateJourneyCoordinator(self):
+        # Get selected Journey coordinator index
+        selected_index = self.Journey_coordinator_listbox.curselection()
+        if selected_index:
+            coordinator_index = selected_index[0]
+            coordinator = self.Journey_coordinators[coordinator_index]
+
+            # Get values from entry fields
+            name = self.entry_name.get()
+            contact_info = self.entry_contact_info.get()
+
+            # Update Journey coordinator attributes
+            coordinator.updateJourneyCoordinator(name=name, contact_info=contact_info)
+
+            # Update Journey coordinator listbox
+            self.updateJourneyCoordinatorListbox()
+
+    def deleteJourneyCoordinator(self):
+        # Get selected Journey coordinator index
+        selected_index = self.Journey_coordinator_listbox.curselection()
+        if selected_index:
+            coordinator_index = selected_index[0]
+            deleted_coordinator = self.Journey_coordinators.pop(coordinator_index)
+            deleted_coordinator.deleteJourneyCoordinator()
+
+            # Update Journey coordinator listbox
+            self.updateJourneyCoordinatorListbox()
+
+    def onJourneyCoordinatorSelect(self, event):
+        # Get selected Journey coordinator index
+        selected_index = self.Journey_coordinator_listbox.curselection()
+        if selected_index:
+            coordinator_index = selected_index[0]
+            coordinator = self.Journey_coordinators[coordinator_index]
+
+            # Update entry fields with selected Journey coordinator details
+            self.entry_name.delete(0, tk.END)
+            self.entry_name.insert(tk.END, coordinator.name)
+            self.entry_contact_info.delete(0, tk.END)
+            self.entry_contact_info.insert(tk.END, coordinator.contact_info)
+
+    def updateJourneyCoordinatorListbox(self):
+        # Clear existing listbox items
+        self.Journey_coordinator_listbox.delete(0, tk.END)
+
+        # Add Journey coordinator names to listbox
+        for coordinator in self.Journey_coordinators:
+            self.Journey_coordinator_listbox.insert(tk.END, coordinator.name)
+
+
+if __name__ == "__main__":
+    app = JourneyManagementApp()
+    app.mainloop()
